@@ -84,6 +84,6 @@ Summarization of the results.
 
 ### Links
 
- * [https://github.com/autorope/donkeycar]
- * [http://docs.donkeycar.com/guide/train_autopilot/]
- * [https://pathmind.com/wiki/deep-reinforcement-learning]
+ * [Donkeycar Github repository](https://github.com/autorope/donkeycar)
+ * [Train autopilot docs](http://docs.donkeycar.com/guide/train_autopilot/)
+ * [Reinforcement Learning](https://pathmind.com/wiki/deep-reinforcement-learning)
