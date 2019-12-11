@@ -29,9 +29,29 @@ The objective is to train an inference system to explore possible usage on small
 
 The dataset can be gathered from the [simulator](http://docs.donkeycar.com/guide/simulator/) or using [sample driving data](https://drive.google.com/open?id=1A5sTSddFsf494UDtnvYQBaEPYX87_LMp) from the community.
 
-Once the data adquisition is defined; the training and test data must be manually classified and organized in the following classes: Center, Left, Right.
+Once the data adquisition is defined; the training and test data must be manually classified and organized in the following classes: `Center`, `Left`, `Right`. The classification process will be done manually an all classes will be assigned to different folders; a tentative folder structure is as follows:
 
-Some Image Processing may be needed, such as use grayscale, normalization, contrast analysis etc...
+```sh
+data
+├───testing
+│   ├───Center
+│   ├───Left
+│   └───Right
+└───training
+    ├───Center
+    ├───Left
+    └───Right
+```
+
+Classes by definition are not balanced, in general when normally driving there will be more samples from `Center` that the `Left`, `Right`; special emphasis must be done to get more data from the missing classes.
+
+Some examples of the type of images from the simulator:
+
+![Center](../data/center_sample.jpg)
+![Left](../data/left_sample.jpg)
+![Right](../data/right_sample.jpg)
+
+Some Image Processing may be needed, such as use grayscale, normalization, contrast analysis, image cropping etc...
 
 ### Solution Statement
 
@@ -43,17 +63,17 @@ In particular, the [keras.py](https://github.com/autorope/donkeycar/blob/dev/don
 
 ### Benchmark Model
 
-Initially, get started using some off-the-shelf classification model such as the [LeNet](http://yann.lecun.com/exdb/lenet/) model which is implemented in different frameworks.
+To get started, use an off-the-shelf classification model such as the [LeNet model](http://yann.lecun.com/exdb/lenet/) which is implemented in different frameworks and adapt it for our classification task. It can be seen as a vanilla CNN model for Digits classification.
 
-Then (and depending on the results), evolve and try more specific models, such as the [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf) by [NVidia](https://developer.nvidia.com/deep-learning), which details how they did to drive a car directly from Cameras.
-
-This would be a starting point, to use a classifier for another task and we can retrain it for our classification purposes.
+Use more specific models, such as the [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf) by [NVidia](https://developer.nvidia.com/deep-learning), which details a specific layer of convolutions to output the directions to drive a car; adapt the final layers to make it a classifier and compare against the first model.
 
 ### Evaluation Metrics
 
-The metrics to be used are those related when using a CNN Convolution Neural Network to classify images; in general a variation of `Softmax` is used; depending on the framework used, the [activation functions](https://keras.io/activations/) will be analyzed and tested.
+The metrics to be used are those related when using a CNN Convolution Neural Network to classify images; in general a variation of `Softmax` is used to select a class; depending on the framework used, the [activation functions](https://keras.io/activations/) will be analyzed and tested.
 
 Evaluate the different available [loss functions](https://keras.io/losses/) to compare Training vs Test data.
+
+Build a 3x3 Multi-Class Confusion Matrix to quantify the performance of the classification algorithm, calculate other metrics such a Precision, Recall to get the F1 Score.
 
 ### Project Design
 
@@ -70,11 +90,88 @@ Use the provided [simulator](http://docs.donkeycar.com/guide/simulator/) to coll
 
 Manually classify the images in 3 classes: `Center`, `Left`, `Right` and divide the resultset into two groups: training (70%) and testing (30%).
 
+Augument data to get more information for the training process to avoiding overfitting. Some ideas to explore are:
+
+ * Horizontal flip of the image
+ * Generate random changes on images, such as modification of contranst and coloring to have an effect in the lighting conditions.
+ * Cropping
+ * normalize the image
+
+Some links on these steps:
+
+* [How to prepare/augment images for neural network?](https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network)
+* [Introduction to Dataset Augmentation and Expansion](https://algorithmia.com/blog/introduction-to-dataset-augmentation-and-expansion)
+* [AutoML for Data Augmentation](https://blog.insightdatascience.com/automl-for-data-augmentation-e87cf692c366)
+
+##### Input Image Structure
+
+The image provided by the simulator is a RGB encoded height:120px and width:160.
+
+As the camera is in a fixed position and the higher part of it is useless for the classification task, it is expected to crop the upper part of it and just feed the network with a smaller Image containing only lane information. For example:
+
+![Center_crop](../data/center_crop_sample.jpg)
+
+Only Image data will be feed to the CNN, some research is needed to check if RGB or just grayscale data is enough (3 vs 1 input dimension).
+
+##### Data Collection
+
+Based on the [donkeycar autopilot documentation](http://docs.donkeycar.com/guide/train_autopilot/) site, it is needed to collect 5-20k images for the training process, which seems to be aroung 10 laps around the selected track. Classes balancing will be checked manually so as to get the same ammout of images for the 3 classes.
+
 #### Framework Exploration
 
-Initially, evaluate the existing code from the [Keras framework](https://keras.io/) and train a classifier.
+Initially, evaluate the existing code from the [Keras framework](https://keras.io/) and train classifiers changing different part of the pipeline. Change the layers of the CNN, reduce or expand the architecture complexity, check if there are some generalizable architecture to be reused for this task.
+
+The most used model is structured as follows and are several variations:
+
+```python
+def default_categorical(input_shape=(120, 160, 3), roi_crop=(0, 0)):
+
+    opt = keras.optimizers.Adam()
+    drop = 0.2
+
+    #we now expect that cropping done elsewhere. we will adjust our expeected image size here:
+    input_shape = adjust_input_shape(input_shape, roi_crop)
+
+    img_in = Input(shape=input_shape, name='img_in')                      # First layer, input layer, Shape comes from camera.py resolution, RGB
+    x = img_in
+    x = Convolution2D(24, (5,5), strides=(2,2), activation='relu', name="conv2d_1")(x)       # 24 features, 5 pixel x 5 pixel kernel (convolution, feauture) window, 2wx2h stride, relu activation
+    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Convolution2D(32, (5,5), strides=(2,2), activation='relu', name="conv2d_2")(x)       # 32 features, 5px5p kernel window, 2wx2h stride, relu activatiion
+    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    if input_shape[0] > 32 :
+        x = Convolution2D(64, (5,5), strides=(2,2), activation='relu', name="conv2d_3")(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
+    else:
+        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_3")(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
+    if input_shape[0] > 64 :
+        x = Convolution2D(64, (3,3), strides=(2,2), activation='relu', name="conv2d_4")(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
+    elif input_shape[0] > 32 :
+        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_4")(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
+    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_5")(x)       # 64 features, 3px3p kernal window, 1wx1h stride, relu
+    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    # Possibly add MaxPooling (will make it less sensitive to position in image).  Camera angle fixed, so may not to be needed
+
+    x = Flatten(name='flattened')(x)                                        # Flatten to 1D (Fully connected)
+    x = Dense(100, activation='relu', name="fc_1")(x)                                    # Classify the data into 100 features, make all negatives 0
+    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dense(50, activation='relu', name="fc_2")(x)                                     # Classify the data into 50 features, make all negatives 0
+    x = Dropout(drop)(x)                                                      # Randomly drop out 10% of the neurons (Prevent overfitting)
+    #categorical output of the angle
+    angle_out = Dense(15, activation='softmax', name='angle_out')(x)        # Connect every input with every output and output 15 hidden units. Use Softmax to give percentage. 15 categories and find best one based off percentage 0.0-1.0
+
+    #continous output of throttle
+    throttle_out = Dense(20, activation='softmax', name='throttle_out')(x)      # Reduce to 1 number, Positive number only
+
+    model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
+    return model
+```
+
+NVidia provided an initial starting point with the CNN architecture from the [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf) paper.
+
+![CNN architecture with 27 million connections and 250 thousand parameters](../data/nvidia_cnn_sample.jpg)
 
 Iterate until the evaluation metrics are satisfied otherwise evaluate other frameworks and start again.
+
 
 #### Conclusion
 
