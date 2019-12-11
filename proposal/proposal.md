@@ -45,10 +45,10 @@ data
 
 Classes by definition are not balanced, in general when normally driving there will be more samples from `Center` that the `Left`, `Right`; special emphasis must be done to get more data from the missing classes.
 
-Some examples of the type of images from the simulator:
+Some examples of the type of images from the simulator (Left, Center, Right):
 
-![Center](../data/center_sample.jpg)
 ![Left](../data/left_sample.jpg)
+![Center](../data/center_sample.jpg)
 ![Right](../data/right_sample.jpg)
 
 Some Image Processing may be needed, such as use grayscale, normalization, contrast analysis, image cropping etc...
@@ -107,7 +107,7 @@ Some links on these steps:
 
 The image provided by the simulator is a RGB encoded height:120px and width:160.
 
-As the camera is in a fixed position and the higher part of it is useless for the classification task, it is expected to crop the upper part of it and just feed the network with a smaller Image containing only lane information. For example:
+As the camera is in a fixed position and the higher part of it is useless for the classification task, it is expected to crop the upper part of it and just feed the network with a smaller Image containing only lane information. For example (Center cropped image):
 
 ![Center_crop](../data/center_crop_sample.jpg)
 
@@ -132,35 +132,51 @@ def default_categorical(input_shape=(120, 160, 3), roi_crop=(0, 0)):
     #we now expect that cropping done elsewhere. we will adjust our expeected image size here:
     input_shape = adjust_input_shape(input_shape, roi_crop)
 
-    img_in = Input(shape=input_shape, name='img_in')                      # First layer, input layer, Shape comes from camera.py resolution, RGB
+    # First layer, input layer, Shape comes from camera.py resolution, RGB
+    img_in = Input(shape=input_shape, name='img_in') 
     x = img_in
-    x = Convolution2D(24, (5,5), strides=(2,2), activation='relu', name="conv2d_1")(x)       # 24 features, 5 pixel x 5 pixel kernel (convolution, feauture) window, 2wx2h stride, relu activation
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Convolution2D(32, (5,5), strides=(2,2), activation='relu', name="conv2d_2")(x)       # 32 features, 5px5p kernel window, 2wx2h stride, relu activatiion
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    # 24 features, 5 pixel x 5 pixel kernel (convolution, feauture) window, 2wx2h stride, relu activation
+    x = Convolution2D(24, (5,5), strides=(2,2), activation='relu', name="conv2d_1")(x)
+    # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
+    # 32 features, 5px5p kernel window, 2wx2h stride, relu activatiion
+    x = Convolution2D(32, (5,5), strides=(2,2), activation='relu', name="conv2d_2")(x)
+    # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
     if input_shape[0] > 32 :
-        x = Convolution2D(64, (5,5), strides=(2,2), activation='relu', name="conv2d_3")(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
+        x = Convolution2D(64, (5,5), strides=(2,2), activation='relu', name="conv2d_3")(x)
     else:
-        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_3")(x)       # 64 features, 5px5p kernal window, 2wx2h stride, relu
+        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_3")(x)
     if input_shape[0] > 64 :
-        x = Convolution2D(64, (3,3), strides=(2,2), activation='relu', name="conv2d_4")(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
+        x = Convolution2D(64, (3,3), strides=(2,2), activation='relu', name="conv2d_4")(x)
     elif input_shape[0] > 32 :
-        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_4")(x)       # 64 features, 3px3p kernal window, 2wx2h stride, relu
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_5")(x)       # 64 features, 3px3p kernal window, 1wx1h stride, relu
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+        x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_4")(x)
+    # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
+    # 64 features, 3px3p kernal window, 1wx1h stride, relu
+    x = Convolution2D(64, (3,3), strides=(1,1), activation='relu', name="conv2d_5")(x)
+    # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
     # Possibly add MaxPooling (will make it less sensitive to position in image).  Camera angle fixed, so may not to be needed
 
-    x = Flatten(name='flattened')(x)                                        # Flatten to 1D (Fully connected)
-    x = Dense(100, activation='relu', name="fc_1")(x)                                    # Classify the data into 100 features, make all negatives 0
-    x = Dropout(drop)(x)                                                      # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
-    x = Dense(50, activation='relu', name="fc_2")(x)                                     # Classify the data into 50 features, make all negatives 0
-    x = Dropout(drop)(x)                                                      # Randomly drop out 10% of the neurons (Prevent overfitting)
+    # Flatten to 1D (Fully connected)
+    x = Flatten(name='flattened')(x)
+    # Classify the data into 100 features, make all negatives 0
+    x = Dense(100, activation='relu', name="fc_1")(x)
+    # Randomly drop out (turn off) 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
+    # Classify the data into 50 features, make all negatives 0
+    x = Dense(50, activation='relu', name="fc_2")(x)
+    # Randomly drop out 10% of the neurons (Prevent overfitting)
+    x = Dropout(drop)(x)
+    
     #categorical output of the angle
-    angle_out = Dense(15, activation='softmax', name='angle_out')(x)        # Connect every input with every output and output 15 hidden units. Use Softmax to give percentage. 15 categories and find best one based off percentage 0.0-1.0
+    # Connect every input with every output and output 15 hidden units. Use Softmax to give percentage. 15 categories and find best one based off percentage 0.0-1.0
+    angle_out = Dense(15, activation='softmax', name='angle_out')(x)
 
     #continous output of throttle
-    throttle_out = Dense(20, activation='softmax', name='throttle_out')(x)      # Reduce to 1 number, Positive number only
+    # Reduce to 1 number, Positive number only
+    throttle_out = Dense(20, activation='softmax', name='throttle_out')(x)
 
     model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
     return model
@@ -171,7 +187,6 @@ NVidia provided an initial starting point with the CNN architecture from the [En
 ![CNN architecture with 27 million connections and 250 thousand parameters](../data/nvidia_cnn_sample.jpg)
 
 Iterate until the evaluation metrics are satisfied otherwise evaluate other frameworks and start again.
-
 
 #### Conclusion
 
