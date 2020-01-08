@@ -43,7 +43,7 @@ data
     └───Right
 ```
 
-Classes by definition are not balanced, in general when normally driving there will be more samples from `Center` that the `Left`, `Right`; special emphasis must be done to get more data from the missing classes.
+Classes by definition are not balanced, in general when normally driving there will be more samples from `Center` than the `Left`, `Right`; special emphasis must be done to get more data from the missing classes.
 
 Some examples of the type of images from the simulator (Left, Center, Right):
 
