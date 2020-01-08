@@ -8,6 +8,8 @@ Capstone project for the Udacity's Machine Learning Nanodegree
 
 ## Project
 
+[link](project/project.md)
+
 ## Links
 
  * [capstone proposal rubric](https://review.udacity.com/#!/rubrics/410/view)
