@@ -136,11 +136,7 @@ Plus some analysis on edge detection using [Canny Edge detection](https://en.wik
 
 ![ROI](./images/canny_threshold.png)
 
-and thesholding it to find the continuous relevant edges
-
-![Sample track](./images/sample_track.JPG)
-
-Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
+and thesholding it to find the continuous relevant edges. Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
 
 ##### Input Image Structure
 
