@@ -138,6 +138,8 @@ Plus some analysis on edge detection using [Canny Edge detection](https://en.wik
 
 and thesholding it to find the continuous relevant edges. Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
 
+This section was valiadted with the [DataManagement](DataManagement.ipynb) jupyter notebook.
+
 ##### Input Image Structure
 
 The image provided by the simulator and in runtime is a RGB encoded height:120px and width:160.
