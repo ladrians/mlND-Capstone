@@ -113,6 +113,33 @@ Some links on these steps:
 * [Introduction to Dataset Augmentation and Expansion](https://algorithmia.com/blog/introduction-to-dataset-augmentation-and-expansion)
 * [AutoML for Data Augmentation](https://blog.insightdatascience.com/automl-for-data-augmentation-e87cf692c366)
 
+
+##### Data Exploration
+
+The following analysis was done on the images.
+
+In general, for the problem we are trying to solve only the bottom part of the image is relevant for classification, so we select the region of interest
+
+![ROI](../data/region_of_interest.png)
+
+and cropped the image to get only the neccesary bits.
+
+![ROI cropped](../data/crop_region_of_interest.png)
+
+An alternative analyisis is to change the image to grayscale to remove the 3 RGB channels and only keep one channel:
+
+![ROI](../data/grayscale.png)
+
+Plus some analysis on edge detection using [Canny Edge detection](https://en.wikipedia.org/wiki/Canny_edge_detector)
+
+![ROI](../data/canny_threshold.png)
+
+and thesholding it to find the continuous relevant edges
+
+![Sample track](../data/sample_track.JPG)
+
+Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
+
 ##### Input Image Structure
 
 The image provided by the simulator and in runtime is a RGB encoded height:120px and width:160.
@@ -138,3 +165,4 @@ TODO
  * [Donkeycar Github repository](https://github.com/autorope/donkeycar)
  * [Train autopilot docs](http://docs.donkeycar.com/guide/train_autopilot/)
  * [Reinforcement Learning](https://pathmind.com/wiki/deep-reinforcement-learning)
+ * [watermark](https://www.watermarquee.com/watermark)
