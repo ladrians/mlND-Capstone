@@ -33,7 +33,9 @@ In the last few year the development of robotics applications using Machine Lear
  
 ### Datasets and Inputs
 
-For this phase a robocar was run to follow a standard race track in recording mode. After a few laps, it recorded thousand of 160x120 RGB images.
+For this phase a robocar was run to follow a standard race track in recording mode. After a few laps, it recorded thousand of 160x120 RGB images. The sample track is as follows:
+
+![Sample Track](./images/sample_track.JPG)
 
 The training and test data was manually classified and organized in the following classes: `Center`, `Left`, `Right`.
 
@@ -120,23 +122,23 @@ The following analysis was done on the images.
 
 In general, for the problem we are trying to solve only the bottom part of the image is relevant for classification, so we select the region of interest
 
-![ROI](../data/region_of_interest.png)
+![ROI](./images/region_of_interest.png)
 
 and cropped the image to get only the neccesary bits.
 
-![ROI cropped](../data/crop_region_of_interest.png)
+![ROI cropped](./images/crop_region_of_interest.png)
 
 An alternative analyisis is to change the image to grayscale to remove the 3 RGB channels and only keep one channel:
 
-![ROI](../data/grayscale.png)
+![ROI](./images/grayscale.png)
 
 Plus some analysis on edge detection using [Canny Edge detection](https://en.wikipedia.org/wiki/Canny_edge_detector)
 
-![ROI](../data/canny_threshold.png)
+![ROI](./images/canny_threshold.png)
 
 and thesholding it to find the continuous relevant edges
 
-![Sample track](../data/sample_track.JPG)
+![Sample track](./images/sample_track.JPG)
 
 Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
 
