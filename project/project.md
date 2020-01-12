@@ -3,7 +3,7 @@
 Luciano Silveira  
 January, 2020
 
-## Proposal
+## I. Proposal
 
 Refer to the proposal [here](../proposal/proposal.md).
 
@@ -19,7 +19,7 @@ My objective is to implement a classification model for the robocar to detect wh
 
 The objective of the project is to implement a classification system for a robotic application.
 
-It builds an inference engine extracting information from a race truck.
+It builds an inference engine extracting information from a race track.
 
 The data was collected using a [donkeycar2 robocar](http://www.donkeycar.com/) following a standard track.
 
@@ -39,7 +39,7 @@ For this phase a robocar was run to follow a standard race track in recording mo
 
 ![Sample Track](./images/sample_track.JPG)
 
-The training and test data was manually classified and organized in the following classes: `Straight`, `Left`, `Right`.
+The training and test data was manually classified and organized in the following classes: `Straight`, `Left`, `Right`; the folder structure:
 
 ```
 data/
@@ -80,7 +80,7 @@ Some examples:
 ![Straight 1](./images/center_sample01.jpg)
 ![Straight 2](./images/center_sample02.jpg)
 
-Classes by definition are not balanced, in general when normally driving there will be more samples from `Straight` than the `Left`, `Right`; special emphasis must be done to get more data from the missing classes.
+Classes by definition are not balanced, in general when normally driving there will be more samples from `Straight` than the `Left`, `Right`; special emphasis must be done to get more data from the missing classes. In particular, our track is almost an oval so it is important to note that we needed to run the robocar in two ways to get equal number of `right` and `left` turns.
 
 Some examples of the type of images from the simulator (Left, Straight, Right):
 
@@ -88,6 +88,7 @@ Some examples of the type of images from the simulator (Left, Straight, Right):
 ![Straight](../data/center_sample.jpg)
 ![Right](../data/right_sample.jpg)
 
+All data is within the ![data](./data/) folder.
 
 ## III. Methodology
 
@@ -100,7 +101,7 @@ The project was divided in the following steps:
 
 ### Data Preprocessing
 
-Manually classify the images in 3 classes: `Straight`, `Left`, `Right` and divide the resultset into two groups: training (70%) and testing (30%).
+Manually classify the images in 3 classes: `Straight`, `Left`, `Right` and divide the resultset into two groups: training and valudation.
 
 Augument data to get more information for the training process to avoiding overfitting. Some ideas to explore are:
 
@@ -110,6 +111,8 @@ Augument data to get more information for the training process to avoiding overf
  * Cropping
  * Normalization
 
+Detail on this exploration can be chacked on the [DataManagement](./DataManagement.ipynb) jupyter notebook.
+ 
 Some links on these steps:
 
 * [How to prepare/augment images for neural network?](https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network)
@@ -138,7 +141,7 @@ Plus some analysis on edge detection using [Canny Edge detection](https://en.wik
 
 and thesholding it to find the continuous relevant edges. Finally the selection is to keep the 3 RGB channels but just center on the selected region of interest.
 
-This section was valiadted with the [DataManagement](DataManagement.ipynb) jupyter notebook.
+This section was valiadted with the [Data Management](DataManagement.ipynb) jupyter notebook.
 
 #### Input Image Structure
 
@@ -150,15 +153,72 @@ As the camera is in a fixed position and the higher part of it is useless for th
 
 ### Framework Exploration
 
-Based on the [Build an Image Dataset in TensorFlow](https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/5_DataManagement/build_an_image_dataset.py) article the following code was developed to evaluate different training alternatives.
+Based on the [Build an Image Dataset in TensorFlow](https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/5_DataManagement/build_an_image_dataset.py) article, the following code was developed to evaluate different training alternatives.
+
+For more information on the exploration, check the [Classification And Evaluation](ClassificationAndEvaluation.ipynb) jupyter notebook.
 
 ### Refinement
+
+The following modes were created
+
+ * Version 1
+ * Version 2
+ * Version 3
+
+#### Version #1
+
+This is the initial version for a classifier, the objective was to create a working pipeline, reading the correct images, train a classifier and get initial evaluation results.
+
+The result of the training is detailed as follows:
+
+![model1_loss](./images/model1_loss.png)
+
+And validation of information was created to check the associated result
+
+![model1_sample](./images/model1_sample.png)
+
+The image details that out of 4 samples; 2 were correctly classified.
+
+#### Version #2
+
+For the following iteration, the objective was to use a similar CNN from the [robocars project](https://github.com/autorope/donkeycar/blob/dev/donkeycar/parts/keras.py), change the output to be a classifier.
+
+```python
+#Class output
+class_out = Dense(class_count, activation='softmax', name='class_out')(x)        # 3 categories and find best one based off percentage 0.0-1.0
+
+model = Model(inputs=[img_in], outputs=[class_out])
+model.compile(optimizer='adam',
+			  loss={'class_out': 'categorical_crossentropy'},
+			  loss_weights={'class_out': 0.1},
+			  metrics=['accuracy'])
+return model
+```
+
+The result of the training is detailed as follows:
+
+![model2_loss](./images/model2_loss.png)
+
+And better validation of results:
+
+![model2_sample](./images/model2_sample.png)
+
+#### Version #3
+
+For the next iteration real experimentation took place. The following changes where applied to prevent overfitting the CNN:
+
+ * Reduce the capacity of the network
+ * Add weight regularization
+ * Add Batch Normalization
+ * Modify the dropout
+
+Ideas taken from [Overfit and Underfit](https://github.com/tensorflow/docs/blob/master/site/en/r1/tutorials/keras/overfit_and_underfit.ipynb)
 
 ##### Dropout
 
 A technique to reduce overfitting is to apply dropout to the CNN. It is a form of regularization that forces the weights in the network to take only small values, which makes the distribution of weight values more regular and the network can reduce overfitting on small training examples. Dropout is one of the regularization technique applied. The following values were tested, 0.3 was selected.
 
-```
+```python
 drop = 0.3 #0.1 # 0.2 # 0.4
 ```
 
@@ -169,6 +229,39 @@ References on this section:
 * [Build an Image Dataset in TensorFlow](https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/5_DataManagement/build_an_image_dataset.py)
 * [Image classification](https://www.tensorflow.org/tutorials/images/classification)
 
+##### Region Of Interest
+
+Based on the data exploration done in [DataManagement](./DataManagement.ipynb); it was trimmed the higher part of the image:
+
+```python
+x = Cropping2D(cropping=((40,0), (0,0)))(x)
+```
+
+##### Batch Normalization
+
+Applied the ideas from [here](https://stackoverflow.com/questions/41847376/keras-model-to-json-error-rawunicodeescape-codec-cant-decode-bytes-in-posi)
+
+
+```python
+x = BatchNormalization(input_shape=default_shape)(x)
+```
+
+More information [here](https://github.com/autorope/notebooks/blob/master/notebooks/train%20on%20all%20data.ipynb)
+
+##### Keras Improvements
+
+Besides several improvements related to the Keras framework
+
+ * Callbacks
+ * Early stopping
+
+The result of the training is detailed as follows:
+
+![model3_loss](./images/model3_loss.png)
+
+And better validation of results:
+
+![model3_sample](./images/model3_sample.png)
 
 ## IV. Results
 
