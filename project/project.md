@@ -59,17 +59,17 @@ The images distribution by class is:
 
 Some examples:
 
-** Right **
+__**Right**__
 
 ![Right 1](./images/right_sample01.jpg)
 ![Right 2](./images/right_sample02.jpg)
 
-** Left **
+__** Left **__
 
 ![Left 1](./images/left_sample01.jpg)
 ![Left 2](./images/left_sample02.jpg)
 
-** Straight **
+__** Straight **__
 
 ![Straight 1](./images/center_sample01.jpg)
 ![Straight 2](./images/center_sample02.jpg)
@@ -314,15 +314,15 @@ x = Cropping2D(cropping=((40,0), (0,0)))(x)
 
 The decision to use this feature is related to the *Salience* analysis for the track. The goal of this kind of visualization is to understand what learns and how a CNN makes its decisions. The central idea in discerning the salient objects is finding parts of the image that correspond to locations where the feature maps of CNN layers have the greatest activations. Based on the [keras-salient-object-visualisation](https://github.com/ermolenkodev/keras-salient-object-visualisation) project; we tested a couple of images using a saliency heatmap.
 
-** Salience Heatmap for the whole image **
+__** Salience Heatmap for the whole image **__
 
-![salience01_before](./images/salience01_before.jpg)
-![salience02_before](./images/salience02_before.jpg)
+![salience01_before](./images/salience01_before.png)
+![salience02_before](./images/salience02_before.png)
 
-** Salience Heatmap ROI image **
+__** Salience Heatmap ROI image **__
 
-![salience01_after](./images/salience01_after.jpg)
-![salience02_after](./images/salience02_after.jpg)
+![salience01_after](./images/salience01_after.png)
+![salience02_after](./images/salience02_after.png)
 
 Notice that the second section has a much stronger focus on the lane lines and everything else is discarded as is not needed as input for the classification task.
 
@@ -381,7 +381,7 @@ For the pipeline evaluation, we created a video with a couple of laps around the
 
 The complete video:
 
-![video_result01](./data/tub_1_18-05-25_output.mp4)
+[video_result01](./data/tub_1_18-05-25_output.mp4)
 
 ### Justification
 
