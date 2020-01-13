@@ -420,7 +420,7 @@ Manually tuning the model needs carefully taking note of the parameters, evaluat
 
 The use of Salience analysis was important to improve the classifier and remove parts of the image that were not useful for the selected task.
 
-Initially, I got encouraging results but not enough to be used as a classification system. The dataset should be increased and polished and trained again. Some extra preprocessing can be done to the images; so as to improve it's classification
+Initially, I got encouraging results but not enough to be used as a classification system. The dataset should be increased and polished and trained again. Some extra preprocessing can be done to the images; so as to improve it's classification:
 
  * change the image color scheme to HSV, Gray or a combination.
  * change the image field of view with a [birds view transformation](https://www.mathworks.com/help/driving/ref/birdseyeview.vehicletoimage.html) to better aply the classification.
@@ -429,7 +429,7 @@ Initially, I got encouraging results but not enough to be used as a classificati
 
  * Get more training data and classify it, mix simulation data to create a more generalized model.
  * data-augmentation; use horizontal flip to auto-generate more `Left` and `Right` samples.
- * Evaluate an alternative training pipeline with `Transfer Learning` (also known as `Behavioral Clonung`). Select and existing models for image classification with weights already trained: (for example [ImageNet Model Zoo for TensorFlow](https://github.com/joeddav/tensorflow-modelzoo) or [Keras applications](https://keras.io/applications/)) and retrain the classifier for our purposes.
+ * Evaluate an alternative training pipeline with `Transfer Learning` (also known as `Behavioral Cloning`). Select and existing models for image classification with weights already trained: (for example [ImageNet Model Zoo for TensorFlow](https://github.com/joeddav/tensorflow-modelzoo) or [Keras applications](https://keras.io/applications/)) and retrain the classifier for our purposes.
 
 -----------
 
@@ -444,3 +444,29 @@ Initially, I got encouraging results but not enough to be used as a classificati
  * [Keras](https://keras.io/)
  * [Training sandbox](https://github.com/autorope/notebooks/blob/master/notebooks/train%20on%20all%20data.ipynb)
  * [Project Rubric](https://review.udacity.com/#!/rubrics/108/view)
+
+### How to reproduce the results
+
+Tested with:
+
+```
+Tensorfow 1.8.0
+Keras 2.0.8
+Numpy 1.14.3
+Matplotlib 2.0.2
+Moviepy 0.2.3.2
+IPython 6.4.0
+import 3.2.0
+```
+
+Unzip the following files:
+
+```
+data/Training.zip
+data/Validation.zip
+```
+
+Use the following Jupyter notebooks:
+
+ * [Data Management](./DataManagement.ipynb)
+ * [Classification And Evaluation](ClassificationAndEvaluation.ipynb)
