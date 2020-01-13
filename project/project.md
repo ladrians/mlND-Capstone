@@ -64,12 +64,12 @@ __**Right**__
 ![Right 1](./images/right_sample01.jpg)
 ![Right 2](./images/right_sample02.jpg)
 
-__** Left **__
+__**Left**__
 
 ![Left 1](./images/left_sample01.jpg)
 ![Left 2](./images/left_sample02.jpg)
 
-__** Straight **__
+__**Straight**__
 
 ![Straight 1](./images/center_sample01.jpg)
 ![Straight 2](./images/center_sample02.jpg)
@@ -314,12 +314,12 @@ x = Cropping2D(cropping=((40,0), (0,0)))(x)
 
 The decision to use this feature is related to the *Salience* analysis for the track. The goal of this kind of visualization is to understand what learns and how a CNN makes its decisions. The central idea in discerning the salient objects is finding parts of the image that correspond to locations where the feature maps of CNN layers have the greatest activations. Based on the [keras-salient-object-visualisation](https://github.com/ermolenkodev/keras-salient-object-visualisation) project; we tested a couple of images using a saliency heatmap.
 
-__** Salience Heatmap for the whole image **__
+__**Salience Heatmap for the whole image**__
 
 ![salience01_before](./images/salience01_before.png)
 ![salience02_before](./images/salience02_before.png)
 
-__** Salience Heatmap ROI image **__
+__**Salience Heatmap ROI image**__
 
 ![salience01_after](./images/salience01_after.png)
 ![salience02_after](./images/salience02_after.png)
@@ -374,28 +374,63 @@ And better validation of results were obtained:
 
 ### Model Evaluation and Validation
 
-For the pipeline evaluation, we created a video with a couple of laps around the selected track and executed it. Some samples:
+To verify the robustness of the final model, a test was conducted using a video taken from the same track. For the pipeline evaluation, we executed the video taking frame by frame and checked the class assigned; some samples are:
 
 ![video_result sample 01](./images/video_result01.png)
 ![video_result sample 02](./images/video_result02.png)
 
 The complete video:
 
-[video_result01](./data/tub_1_18-05-25_output.mp4)
+[video track result](./data/tub_1_18-05-25_output.mp4)
+
+the following observations are based on this test:
+
+ * Classification errors: in several sections of the track a wrong classification class was assigned.
 
 ### Justification
 
+The final architecture and hyperparameters are those related to the `Version #3` because they performed the best among the tried combinations. Some comments on the important parts:
+
+ * Cropping resulted to be very important once the Salience analysis was done.
+ * Dropout worked better in reducing overfitting. The procedure to interleave it in the architecture was basically try and error and check the training accuracy and loss graphs.
+ * Keras Callbacks were very useful not to continue training a model if it does not improve after a couple of epochs.
+
 ## V. Conclusion
+
+The model satisfactory met the given requirements. This model will only work on the specified track. A test was done to use the classifier on the simulator data but the result was very discorauging:
+
+![video_result simulation 01](./images/video_result_simulation01.png)
+![video_result simulation 02](./images/video_result_simulation02.png)
+
+The [simulation video](./data/simulator_sandbox01_output.mp4) result.
 
 ### Reflection
 
-The use of Salience Analysis was important to improve the classifier.
+The process used for this project can be summarized using the following steps:
+
+ * Research and Frame a relevant problem based on the knowledge acquired.
+ * Generate a dataset for the problem
+ * Manually segment the information
+ * Create a benchmark for the classifier
+ * Train the classifier using the sample data multiple times until a good set of parameters were found.
+ * Reviewed code from differente sources: Tensorflow, Keras, Donkeycar repositories and create a specific pipeline.
+ * Create own metrics and visualization for evaluation.
+
+Manually tuning the model needs carefully taking note of the parameters, evaluate, measure and readjust.
+
+The use of Salience analysis was important to improve the classifier and remove parts of the image that were not useful for the selected task.
+
+Initially, I got encouraging results but not enough to be used as a classification system. The dataset should be increased and polished and trained again. Some extra preprocessing can be done to the images; so as to improve it's classification
+
+ * change the image color scheme to HSV, Gray or a combination.
+ * change the image field of view with a [birds view transformation](https://www.mathworks.com/help/driving/ref/birdseyeview.vehicletoimage.html) to better aply the classification.
 
 ### Improvement
 
- * Get more training data and classify it
- * data-augmentation; use horizontal flip to auto-generate more Left and Right samples.
- * Select and existing models for image classification with weights already trained: (for example [ImageNet Model Zoo for TensorFlow](https://github.com/joeddav/tensorflow-modelzoo) or [Keras applications](https://keras.io/applications/)) and retrain the classifier for our purposes.
+ * Get more training data and classify it, mix simulation data to create a more generalized model.
+ * data-augmentation; use horizontal flip to auto-generate more `Left` and `Right` samples.
+ * Evaluate an alternative training pipeline with `Transfer Learning` (also known as `Behavioral Clonung`). Select and existing models for image classification with weights already trained: (for example [ImageNet Model Zoo for TensorFlow](https://github.com/joeddav/tensorflow-modelzoo) or [Keras applications](https://keras.io/applications/)) and retrain the classifier for our purposes.
+
 -----------
 
 ### Links
@@ -408,3 +443,4 @@ The use of Salience Analysis was important to improve the classifier.
  * [Techniques to Tackle Overfitting and Achieve Robustness for Donkey Car Neural Network Self-Driving Agent](https://flyyufelix.github.io/2019/06/04/pixmoving-hackathon.html)
  * [Keras](https://keras.io/)
  * [Training sandbox](https://github.com/autorope/notebooks/blob/master/notebooks/train%20on%20all%20data.ipynb)
+ * [Project Rubric](https://review.udacity.com/#!/rubrics/108/view)
