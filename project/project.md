@@ -33,7 +33,7 @@ To judge the performance of the model, the metric selected is `Classification Ac
 Accuracy = number of correct predictions / total number of predictions * 100
 ```
 
-Other important metrics detailed in the [proposal](../proposal/proposal.md) are Precision and Recall but were discarded. There are many cases in which `Classification Accuracy` is not a good indicator. One case is when the class distribution is imbalanced (one class is more frequent than others) and other metrics are needed. In this scenario (as detailed in Section II) the dataset is manually built-up and precautions were taken to generate relatively balanced classes.
+Other important metrics detailed in the [proposal](../proposal/proposal.md) are `Precision` and `Recall` but were discarded. There are many cases in which `Classification Accuracy` is not a good indicator. One case is when the class distribution is imbalanced (one class is more frequent than others) and other metrics are needed. In this scenario (as detailed in Section II) the dataset is manually built-up and precautions were taken to generate relatively balanced classes.
 
 Some related links:
 
