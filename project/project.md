@@ -25,6 +25,20 @@ In the last few year the development of robotics applications using Machine Lear
  * Left side of the track
  * Right side of the track
 
+### Metrics
+
+To judge the performance of the model, the metric selected is `Classification Accuracy`; which calculates how often predictions matches the labels meaning the percentage of correct preductions
+
+```
+Accuracy = number of correct predictions / total number of predictions * 100
+```
+
+Other important metrics detailed in the [proposal](../proposal/proposal.md) are Precision and Recall but were discarded. There are many cases in which `Classification Accuracy` is not a good indicator. One case is when the class distribution is imbalanced (one class is more frequent than others) and other metrics are needed. In this scenario (as detailed in Section II) the dataset is manually built-up and precautions were taken to generate relatively balanced classes.
+
+Some related links:
+
+* [Classification & Regression Evaluation Metrics](https://towardsdatascience.com/20-popular-machine-learning-metrics-part-1-classification-regression-evaluation-metrics-1ca3e282a2ce)
+
 ## II. Analysis
 
 ### Datasets and Inputs
@@ -83,6 +97,18 @@ Some examples of the type of images from the simulator (Left, Straight, Right):
 ![Right](../data/right_sample.jpg)
 
 All data is within the [data](./data/) folder.
+
+### Benchmark Model
+
+It was not possible to benchmark this work against existing ones. The author is aware that this kind of research is being done for reinforcement learning algorithms, as `helper methods` so as an agent can get additional information about the environment; for the case to know the location of the robocar within the track, for example similar to the available parameters in the [Deepracer](https://aws.amazon.com/deepracer/) competition where a [reward function](https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-how-it-works-action-space.html) may be programmed to encourage the agent to stay as close to the center line as possible.
+
+Taking ideas from [Evaluate the Performance Of Deep Learning Models in Keras](https://machinelearningmastery.com/evaluate-performance-deep-learning-models-keras/), after training each model the average and standard deviation of the model `Accuracy` and `Loss` are printed and later compared to each other.
+
+Some related links:
+
+ * Paper [Self-driving scale car trained by Deep reinforcement Learning](https://arxiv.org/ftp/arxiv/papers/1909/1909.03467.pdf)
+ * [AWS DeepRacer Reward Function](https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-reward-function-input.html)
+ * [Semantic segmentation by NVidia](https://github.com/NVIDIA/semantic-segmentation)
 
 ## III. Methodology
 
@@ -373,6 +399,15 @@ And better validation of results were obtained:
 ## IV. Results
 
 ### Model Evaluation and Validation
+
+Comparing the 3 CNNs created, the Accuracy and Loss streadily improved in every iteration.
+
+|Measure|#1|#2|#3|
+|---|---|---|---|
+|Train accuracy|0.32%|0.89%|0.98%|
+|Test accuracy|.45%|0.95%|0.98%|
+|Train loss|0.59%|0.02%|0.02%|
+|Test loss|0.58%|0.01%|0.01%|
 
 To verify the robustness of the final model, a test was conducted using a video taken from the same track. For the pipeline evaluation, we executed the video taking frame by frame and checked the class assigned; some samples are:
 
